@@ -21,10 +21,6 @@ import config
 
 HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [STOP|START|RESTART], BATTERY, PHOTO, VIDEO [s], HELP"
 
-def debug(msg):
-    if config.DEBUG:
-        print(msg)
-
 # Create the log directory if it does not exists
 os.makedirs(config.LOG_PATH, exist_ok=True)
 
