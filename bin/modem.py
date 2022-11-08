@@ -81,7 +81,7 @@ def send_sms(modem: str, text: str, number: str):
     debug("arg:\n", result.args, "out:\n", result.stdout, "err:\n", result.stderr)
     if result.returncode == 0:
         sms = result.stdout.decode("utf-8").split("\n")[0].split(" ")[4]
-        result = subprocess.run(['mmcli', '-m', modem, '-s', sms], stdout=subprocess.PIPE)
+        result = subprocess.run(['mmcli', '-m', modem, '-s', sms, "--send"], stdout=subprocess.PIPE)
         debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
         delete_sms(modem, sms)
     return result.returncode==0, result.returncode
