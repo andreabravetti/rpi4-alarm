@@ -66,7 +66,7 @@ while True:
                 send_sms(modem, err_msg, config.TRUSTED_PHONE)
                 with os.fdopen(log_fd, 'w') as f:
                     f.write(json.dumps(sms_body, indent=4))
-        # Remove the sms
-        delete_sms(modem, sms)
+            # Remove the sms
+            delete_sms(modem, sms)
     # All done, sleep
     time.sleep(config.SLEEP_TIME)
