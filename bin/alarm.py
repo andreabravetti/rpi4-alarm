@@ -11,6 +11,7 @@ import os
 import time
 import tempfile
 from modem import *
+from utility import *
 import config
 
 HELP_MSG="RPI4 Alarm available commands: SHUTDOWN, REBOOT, MOTION [ON|OFF], BATTERY, PHOTO, VIDEO [s], HELP"

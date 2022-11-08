@@ -13,6 +13,8 @@
 import subprocess
 import json
 
+from utility import *
+
 def fix_text(string: str):
     if len(string) > 160:
         return (string[:157]+"...").replace("'", " ")
@@ -76,9 +78,11 @@ def send_sms(modem: str, text: str, number: str):
     # FIXME:
     # https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/issues/657
     result = subprocess.run(['mmcli', '-m', modem, '''--messaging-create-sms=text="%s",number="%s"''' % (fix_text(text), number)], stdout=subprocess.PIPE)
+    debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
     if result.returncode == 0:
         sms = result.stdout.decode("utf-8").split("\n")[0].split(" ")[4]
         result = subprocess.run(['mmcli', '-m', modem, '-s', sms], stdout=subprocess.PIPE)
+        debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
         delete_sms(modem, sms)
     return result.returncode==0, result.returncode
 
@@ -86,4 +90,5 @@ def delete_sms(modem: str, sms: str):
     # mmcli -m 0 --messaging-delete-sms=7
     # successfully deleted SMS from modem
     result = subprocess.run(['mmcli', '-m', modem, '--messaging-delete-sms=%s' % sms], stdout=subprocess.PIPE)
+    debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
     return result.returncode==0, result.returncode
