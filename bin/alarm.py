@@ -26,8 +26,9 @@ def debug(msg):
 debug("Starting RPI4 Alarm")
 modem_list, modem_error = list_modem()
 for modem in modem_list:
-    send_sms(modem, "Starting RPI4 Alarm", config.TRUSTED_PHONE)
     debug("Found modem " + modem)
+    sent, ret = send_sms(modem, "Starting RPI4 Alarm", config.TRUSTED_PHONE)
+    debug("Sent initial message: %s, %s" % (sent, ret))
 
 # Main loop
 while True:
