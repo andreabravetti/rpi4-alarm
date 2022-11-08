@@ -44,30 +44,41 @@ while True:
                 sms_split = sms_text.split(" ")
                 sms_split.append("")
                 sms_command = sms_split[0].upper()
+                debug("Command %s received from %s" % (sms_command, sms_sender))
                 match sms_command:
                     case "SHUTDOWN":
                         sent, ret = send_sms(modem, "Shutting down RPI4 Alarm", config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "REBOOT":
                         sent, ret = send_sms(modem, "Restarting RPI4 Alarm", config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "MOTION":
                         match sms_split[1].upper():
                             case "OFF":
                                 sent, ret = send_sms(modem, "Stopping motion detection", config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                             case "ON":
                                 sent, ret = send_sms(modem, "Restarting motion detection", config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                             case _:
                                 sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "BATTERY":
                         sent, ret = send_sms(modem, "Battery status 99%, charging 1", config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "PHOTO":
                         sent, ret = send_sms(modem, "Photo taken", config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "VIDEO":
                         video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
                         sent, ret = send_sms(modem, "Video recorded for %ds" % video_time, config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "HELP":
                         sent, ret = send_sms(modem, HELP_MSG, config.TRUSTED_PHONE)
+                        debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case _:
                         sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
+                        debug("Reply to INVALID sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
             else:
                 log_fd, log_name = tempfile.mkstemp(suffix=".json", prefix="invalid-sms-", dir=config.LOG_PATH)
                 err_msg = "Warning: Invalid from %s, text logged in %s!" % (sms_sender, log_name)
