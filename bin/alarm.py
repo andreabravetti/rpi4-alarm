@@ -11,8 +11,11 @@ import os
 import time
 import tempfile
 import subprocess
+
 from modem import *
 from utility import *
+from upsplus import *
+
 import config
 
 HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [ON|OFF], BATTERY, PHOTO, VIDEO [s], HELP"
@@ -80,7 +83,9 @@ while True:
                                 sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
                                 debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "BATTERY":
-                        sent, ret = send_sms(modem, "Battery status 99%, charging 1", config.TRUSTED_PHONE)
+                        bp, _ = battery_percentage()
+                        iv, _ = input_voltage()
+                        sent, ret = send_sms(modem, "Battery status %d%, charging %s" % (bp, iv>3000), config.TRUSTED_PHONE)
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case "PHOTO":
                         sent, ret = send_sms(modem, "Photo taken", config.TRUSTED_PHONE)
