@@ -29,7 +29,10 @@ debug("Starting RPI4 Alarm")
 modem_list, modem_error = list_modem()
 for modem in modem_list:
     debug("Found modem " + modem)
-    sent, ret = send_sms(modem, "Starting RPI4 Alarm", config.TRUSTED_PHONE)
+    sms_list, sms_error = list_sms(modem)
+    if len(sms_list) > 0:
+        debug("Found %s pending messages" % len(sms_list))
+    sent, ret = send_sms(modem, "Starting RPI4 Alarm with %d pending commands" % len(sms_list), config.TRUSTED_PHONE)
     debug("Sent initial message: %s, %s" % (sent, ret))
 
 # Main loop
