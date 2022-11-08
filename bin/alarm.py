@@ -80,7 +80,7 @@ while True:
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                                     deferred = ['systemctl', 'stop', 'motion']
                                 case "START":
-                                    sent, ret = send_sms(modem, "Restarting motion detection", config.TRUSTED_PHONE)
+                                    sent, ret = send_sms(modem, "Starting motion detection", config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                                     deferred = ['systemctl', 'start', 'motion']
                                 case "RESTART":
