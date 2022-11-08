@@ -19,7 +19,7 @@ from upsplus import *
 
 import config
 
-HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [ON|OFF], BATTERY, PHOTO, VIDEO [s], HELP"
+HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [STOP|START|RESTART], BATTERY, PHOTO, VIDEO [s], HELP"
 
 def debug(msg):
     if config.DEBUG:
@@ -75,12 +75,18 @@ while True:
                             deferred = ['reboot']
                         case "MOTION":
                             match sms_split[1].upper():
-                                case "OFF":
+                                case "STOP":
                                     sent, ret = send_sms(modem, "Stopping motion detection", config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                                case "ON":
+                                    deferred = ['systemctl', 'stop', 'motion']
+                                case "START":
                                     sent, ret = send_sms(modem, "Restarting motion detection", config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                                    deferred = ['systemctl', 'start', 'motion']
+                                case "RESTART":
+                                    sent, ret = send_sms(modem, "Restarting motion detection", config.TRUSTED_PHONE)
+                                    debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                                    deferred = ['systemctl', 'restart', 'motion']
                                 case _:
                                     sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
