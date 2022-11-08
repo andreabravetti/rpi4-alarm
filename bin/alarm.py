@@ -41,6 +41,7 @@ while True:
             sms_body, read_error = read_sms(modem, sms)
             sms_sender = sms_body.get("content", {}).get("number", "")
             sms_text = sms_body.get("content", {}).get("text", "")
+            deferred = None
             debug("Message received from %s, text length %d" % (sms_sender, len(sms_text)))
             if sms_sender == config.TRUSTED_PHONE:
                 sms_split = sms_text.split(" ")
@@ -51,19 +52,19 @@ while True:
                     # case "STOP":
                     #     sent, ret = send_sms(modem, "Shutting down RPI4 Alarm service", config.TRUSTED_PHONE)
                     #     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                    #     subprocess.run(['systemctl', 'stop', 'rpi4-alarm'])
+                    #     deferred = ['systemctl', 'stop', 'rpi4-alarm']
                     case "RESTART":
                         sent, ret = send_sms(modem, "Restarting RPI4 Alarm service", config.TRUSTED_PHONE)
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                        subprocess.run(['systemctl', 'restart', 'rpi4-alarm'])
+                        deferred = ['systemctl', 'restart', 'rpi4-alarm']
                     # case "POWEROFF":
                     #     sent, ret = send_sms(modem, "Shutting down RPI4 Alarm host", config.TRUSTED_PHONE)
                     #     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                    #     subprocess.run(['poweroff'])
+                    #     deferred = ['poweroff']
                     case "REBOOT":
                         sent, ret = send_sms(modem, "Restarting RPI4 Alarm host", config.TRUSTED_PHONE)
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                        subprocess.run(['reboot'])
+                        deferred = ['reboot']
                     case "MOTION":
                         match sms_split[1].upper():
                             case "OFF":
@@ -99,6 +100,10 @@ while True:
                     f.write(json.dumps(sms_body, indent=4))
             # Remove the sms
             deleted, ret = delete_sms(modem, sms)
-            debug("Deleted message %s: %s, %s" % (sms, sent, ret))
+            if deleted:
+                subprocess.run(deferred)
+                debug("Deleted message %s: %s, %s" % (sms, sent, ret))
+            else:
+                debug("Error deleting %s: deferred command \"%s\" not executed!" % (sms, " ".join(deferred)))
     # All done, sleep
     time.sleep(config.SLEEP_TIME)
