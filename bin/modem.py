@@ -78,7 +78,7 @@ def send_sms(modem: str, text: str, number: str):
     # FIXME:
     # https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/issues/657
     result = subprocess.run(['mmcli', '-m', modem, '''--messaging-create-sms=text="%s",number="%s"''' % (fix_text(text), number)], stdout=subprocess.PIPE)
-    debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
+    debug("arg:\n", result.args, "out:\n", result.stdout, "err:\n", result.stderr)
     if result.returncode == 0:
         sms = result.stdout.decode("utf-8").split("\n")[0].split(" ")[4]
         result = subprocess.run(['mmcli', '-m', modem, '-s', sms], stdout=subprocess.PIPE)
@@ -90,5 +90,5 @@ def delete_sms(modem: str, sms: str):
     # mmcli -m 0 --messaging-delete-sms=7
     # successfully deleted SMS from modem
     result = subprocess.run(['mmcli', '-m', modem, '--messaging-delete-sms=%s' % sms], stdout=subprocess.PIPE)
-    debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
+    debug("arg:\n", result.args, "out:\n", result.stdout, "err:\n", result.stderr)
     return result.returncode==0, result.returncode

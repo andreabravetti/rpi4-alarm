@@ -9,6 +9,7 @@
 
 import config
 
-def debug(msg):
+def debug(*args):
     if config.DEBUG:
-        print(msg)
+        for msg in args:
+            print(msg)
