@@ -103,10 +103,11 @@ while True:
                     f.write(json.dumps(sms_body, indent=4))
             # Remove the sms
             deleted, ret = delete_sms(modem, sms)
-            if deleted:
-                subprocess.run(deferred)
-                debug("Deleted message %s: %s, %s" % (sms, sent, ret))
-            else:
+            debug("Deleted message %s: %s, %s" % (sms, sent, ret))
+            if not deleted:
                 debug("Error deleting %s: deferred command \"%s\" not executed!" % (sms, " ".join(deferred)))
+            elif deferred is not None:
+                result = subprocess.run(deferred)
+                debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
     # All done, sleep
     time.sleep(config.SLEEP_TIME)
