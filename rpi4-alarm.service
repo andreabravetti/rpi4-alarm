@@ -1,0 +1,19 @@
+Description="RPI4 Alarm"
+Wants=network.target
+Before=network-online.target
+
+[Service]
+Type=simple
+UMask=0022
+PIDFile=/var/run/rpi4-alarm.pid
+WorkingDirectory=/home/alarm
+ExecStart=/home/alarm/bin/alarm.py
+Restart=always
+StartLimitInterval=60
+StartLimitBurst=10
+TimeoutSec=30
+KillMode=mixed
+
+[Install]
+WantedBy=network-online.target
+
