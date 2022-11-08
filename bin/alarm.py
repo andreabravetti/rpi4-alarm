@@ -79,7 +79,7 @@ while True:
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                     case _:
                         sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
-                        debug("Reply to INVALID sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                        debug("Reply to INVALID sent to %s: %s, %s" % (config.TRUSTED_PHONE, sent, ret))
             else:
                 log_fd, log_name = tempfile.mkstemp(suffix=".json", prefix="invalid-sms-", dir=config.LOG_PATH)
                 err_msg = "Warning: Invalid from %s, text logged in %s!" % (sms_sender, log_name)
