@@ -18,10 +18,16 @@ HELP_MSG="RPI4 Alarm available commands: SHUTDOWN, REBOOT, MOTION [ON|OFF], BATT
 # Create the log directory if it does not exists
 os.makedirs(config.LOG_PATH, exist_ok=True)
 
+def debug(msg):
+    if config.DEBUG:
+        print(msg)
+
 # Initial starting message
+debug("Starting RPI4 Alarm")
 modem_list, modem_error = list_modem()
 for modem in modem_list:
     send_sms(modem, "Starting RPI4 Alarm", config.TRUSTED_PHONE)
+    debug("Found modem " + modem)
 
 # Main loop
 while True:

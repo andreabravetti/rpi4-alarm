@@ -11,3 +11,4 @@ DEFAULT_EMAIL="god@paradise.gov"
 TRUSTED_PHONE="+000000000000"
 SLEEP_TIME=3
 LOG_PATH="/home/alarm/log"
+DEBUG=True
