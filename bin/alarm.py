@@ -10,11 +10,12 @@
 import os
 import time
 import tempfile
+import subprocess
 from modem import *
 from utility import *
 import config
 
-HELP_MSG="RPI4 Alarm available commands: SHUTDOWN, REBOOT, MOTION [ON|OFF], BATTERY, PHOTO, VIDEO [s], HELP"
+HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [ON|OFF], BATTERY, PHOTO, VIDEO [s], HELP"
 
 def debug(msg):
     if config.DEBUG:
@@ -47,12 +48,22 @@ while True:
                 sms_command = sms_split[0].upper()
                 debug("Command %s received from %s" % (sms_command, sms_sender))
                 match sms_command:
-                    case "SHUTDOWN":
-                        sent, ret = send_sms(modem, "Shutting down RPI4 Alarm", config.TRUSTED_PHONE)
+                    # case "STOP":
+                    #     sent, ret = send_sms(modem, "Shutting down RPI4 Alarm service", config.TRUSTED_PHONE)
+                    #     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                    #     subprocess.run(['systemctl', 'stop', 'rpi4-alarm'])
+                    case "RESTART":
+                        sent, ret = send_sms(modem, "Restarting RPI4 Alarm service", config.TRUSTED_PHONE)
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                        subprocess.run(['systemctl', 'restart', 'rpi4-alarm'])
+                    # case "POWEROFF":
+                    #     sent, ret = send_sms(modem, "Shutting down RPI4 Alarm host", config.TRUSTED_PHONE)
+                    #     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                    #     subprocess.run(['poweroff'])
                     case "REBOOT":
-                        sent, ret = send_sms(modem, "Restarting RPI4 Alarm", config.TRUSTED_PHONE)
+                        sent, ret = send_sms(modem, "Restarting RPI4 Alarm host", config.TRUSTED_PHONE)
                         debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                        subprocess.run(['reboot'])
                     case "MOTION":
                         match sms_split[1].upper():
                             case "OFF":
