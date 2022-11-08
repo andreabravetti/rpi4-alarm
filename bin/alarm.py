@@ -89,7 +89,7 @@ while True:
                         case "BATTERY":
                             bp, _ = battery_percentage()
                             iv, _ = input_voltage()
-                            cc = ("charging voltage %.2f" % iv/1000) if iv>3000 else "not charging"
+                            cc = ("charging voltage %.2fv" % (iv/1000)) if iv>3000 else "not charging"
                             sent, ret = send_sms(modem, "Battery status %d%%, %s" % (bp, cc), config.TRUSTED_PHONE)
                             debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "PHOTO":
