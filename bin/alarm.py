@@ -108,10 +108,10 @@ while True:
                             # apt install fswebcam
                             _, photo_name = tempfile.mkstemp(suffix=".jpg", prefix="photo-", dir=config.LOG_PATH)
                             active_motion = subprocess.run(['systemctl', 'status', 'motion']).returncode == 0
-                            try:
-                                if active_motion:
-                                    subprocess.run(['systemctl', 'stop', 'motion']).check_returncode()
-                                    time.sleep(1)
+                            if active_motion:
+                                sent, ret = send_sms(modem, "Can't take photo while motion is running", config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                            else:
                                 result = subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
                                 if result.returncode == 0:
                                     photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
@@ -121,9 +121,6 @@ while True:
                                 else:
                                     sent, ret = send_sms(modem, "Error %d taking photo" % result.returncode, config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
-                            finally:
-                                if active_motion:
-                                    subprocess.run(['systemctl', 'restart', 'motion'])
                         case "VIDEO":
                             video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
                             sent, ret = send_sms(modem, "Video recorded for %ds" % video_time, config.TRUSTED_PHONE)
