@@ -91,6 +91,10 @@ while True:
                                     sent, ret = send_sms(modem, "Restarting motion detection", config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                                     deferred = ['systemctl', 'restart', 'motion']
+                                case "STATUS":
+                                    result = subprocess.run(['systemctl', 'status', 'motion'])
+                                    sent, ret = send_sms(modem, "Motion detection status %d" % result.returncode, config.TRUSTED_PHONE)
+                                    debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                                 case _:
                                     sent, ret = send_sms(modem, "Invalid command: " + sms_text, config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
@@ -103,11 +107,15 @@ while True:
                         case "PHOTO":
                             # apt install fswebcam
                             _, photo_name = tempfile.mkstemp(suffix=".jpg", prefix="photo-", dir=config.LOG_PATH)
-                            subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
-                            photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
-                            send_mail_with_auth("Alarm photo", photo_sub, photo_name)
-                            sent, ret = send_sms(modem, photo_sub, config.TRUSTED_PHONE)
-                            debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                            result = subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
+                            if result.returncode == 0:
+                                photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
+                                send_mail_with_auth("Alarm photo", photo_sub, photo_name)
+                                sent, ret = send_sms(modem, photo_sub, config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                            else:
+                                sent, ret = send_sms(modem, "Error %d taking photo" % result.returncode, config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "VIDEO":
                             video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
                             sent, ret = send_sms(modem, "Video recorded for %ds" % video_time, config.TRUSTED_PHONE)
