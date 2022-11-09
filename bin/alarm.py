@@ -23,6 +23,12 @@ import config
 
 HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION [STOP|START|RESTART], BATTERY, PHOTO, VIDEO [s], HELP"
 
+# Patch tempfile:
+class _HexRandomNameSequence(tempfile._RandomNameSequence):
+    characters = "ABCDEF0123456789"
+
+tempfile._name_sequence = _HexRandomNameSequence()
+
 # Create the log directory if it does not exists
 os.makedirs(config.LOG_PATH, exist_ok=True)
 
