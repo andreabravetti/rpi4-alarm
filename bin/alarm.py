@@ -12,10 +12,12 @@ import time
 import tempfile
 import traceback
 import subprocess
+from datetime import datetime
 
-from modem import *
-from utility import *
-from upsplus import *
+from modem import list_modem, list_sms, read_sms, send_sms, delete_sms
+from utility import debug
+from upsplus import input_voltage, battery_percentage
+from sendmail import send_mail_with_auth
 
 import config
 
@@ -93,7 +95,12 @@ while True:
                             sent, ret = send_sms(modem, "Battery status %d%%, %s" % (bp, cc), config.TRUSTED_PHONE)
                             debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "PHOTO":
-                            sent, ret = send_sms(modem, "Photo taken", config.TRUSTED_PHONE)
+                            # apt install fswebcam
+                            _, photo_name = tempfile.mkstemp(suffix=".jpg", prefix="photo-", dir=config.LOG_PATH)
+                            subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
+                            photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
+                            send_mail_with_auth("Alarm photo", photo_sub, photo_name)
+                            sent, ret = send_sms(modem, photo_sub, config.TRUSTED_PHONE)
                             debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "VIDEO":
                             video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3

@@ -10,3 +10,5 @@ __pycache__/
 config.py[cod]
 config.py
 
+# Varie
+log

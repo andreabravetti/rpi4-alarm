@@ -7,8 +7,13 @@
 # Author : Andrea Bravetti
 # ---------------------------------------------------------------
 
-DEFAULT_EMAIL="god@paradise.gov"
+EMAIL_SENDER="motion@paradise.gov"
+EMAIL_ADDRESS="god@paradise.gov"
+EMAIL_PASSWORD="pass123!"
+
 TRUSTED_PHONE="+000000000000"
+
 SLEEP_TIME=3
+
 LOG_PATH="/home/alarm/log"
 DEBUG=True
