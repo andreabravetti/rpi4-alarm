@@ -111,6 +111,7 @@ while True:
                             try:
                                 if active_motion:
                                     subprocess.run(['systemctl', 'stop', 'motion']).check_returncode()
+                                    time.sleep(1)
                                 result = subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
                                 if result.returncode == 0:
                                     photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
