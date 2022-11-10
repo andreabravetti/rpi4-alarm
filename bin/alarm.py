@@ -25,7 +25,7 @@ HELP_MSG="RPI4 Alarm available commands: STOP, RESTART, POWEROFF, REBOOT, MOTION
 
 # Patch tempfile:
 class _HexRandomNameSequence(tempfile._RandomNameSequence):
-    characters = "ABCDEF0123456789"
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 tempfile._name_sequence = _HexRandomNameSequence()
 
@@ -112,7 +112,7 @@ while True:
                                 sent, ret = send_sms(modem, "Can't take photo while motion is running", config.TRUSTED_PHONE)
                                 debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                             else:
-                                result = subprocess.run(["fswebcam", "-r", "2592x1944", photo_name])
+                                result = subprocess.run(["fswebcam", "--no-banner", "-d", "/dev/video0", "-r", "1920x1080", photo_name])
                                 if result.returncode == 0:
                                     photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
                                     send_mail_with_auth("Alarm photo", photo_sub, photo_name)
@@ -122,9 +122,22 @@ while True:
                                     sent, ret = send_sms(modem, "Error %d taking photo" % result.returncode, config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "VIDEO":
-                            video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
-                            sent, ret = send_sms(modem, "Video recorded for %ds" % video_time, config.TRUSTED_PHONE)
-                            debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                            _, video_name = tempfile.mkstemp(suffix=".mkv", prefix="video-", dir=config.LOG_PATH)
+                            active_motion = subprocess.run(['systemctl', 'status', 'motion']).returncode == 0
+                            if active_motion:
+                                sent, ret = send_sms(modem, "Can't record a video while motion is running", config.TRUSTED_PHONE)
+                                debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                            else:
+                                video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
+                                result = subprocess.run(["ffmpeg", "-t", "%d" % video_time, "-f", "v4l2", "-framerate", "30", "-video_size", "800x600", "-i", "/dev/video0", video_name])
+                                if result.returncode == 0:
+                                    video_sub = "Video recorded on %s for %ds in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), video_time, video_name)
+                                    send_mail_with_auth("Alarm video", video_sub, video_name)
+                                    sent, ret = send_sms(modem, video_sub, config.TRUSTED_PHONE)
+                                    debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
+                                else:
+                                    sent, ret = send_sms(modem, "Error %d recording video" % result.returncode, config.TRUSTED_PHONE)
+                                    debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "HELP":
                             sent, ret = send_sms(modem, HELP_MSG, config.TRUSTED_PHONE)
                             debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
