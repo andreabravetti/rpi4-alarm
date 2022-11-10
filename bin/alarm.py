@@ -9,6 +9,7 @@
 
 import os
 import time
+import json
 import tempfile
 import traceback
 import subprocess
@@ -106,7 +107,9 @@ while True:
                             debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "PHOTO":
                             # apt install fswebcam
-                            _, photo_name = tempfile.mkstemp(suffix=".jpg", prefix="photo-", dir=config.LOG_PATH)
+                            photo_fd, photo_name = tempfile.mkstemp(suffix=".jpg", prefix="photo-", dir=config.LOG_PATH)
+                            os.close(photo_fd)
+                            os.remove(photo_name)
                             active_motion = subprocess.run(['systemctl', 'status', 'motion']).returncode == 0
                             if active_motion:
                                 sent, ret = send_sms(modem, "Can't take photo while motion is running", config.TRUSTED_PHONE)
@@ -122,7 +125,9 @@ while True:
                                     sent, ret = send_sms(modem, "Error %d taking photo" % result.returncode, config.TRUSTED_PHONE)
                                     debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                         case "VIDEO":
-                            _, video_name = tempfile.mkstemp(suffix=".mkv", prefix="video-", dir=config.LOG_PATH)
+                            video_fd, video_name = tempfile.mkstemp(suffix=".mkv", prefix="video-", dir=config.LOG_PATH)
+                            os.close(video_fd)
+                            os.remove(video_name)
                             active_motion = subprocess.run(['systemctl', 'status', 'motion']).returncode == 0
                             if active_motion:
                                 sent, ret = send_sms(modem, "Can't record a video while motion is running", config.TRUSTED_PHONE)
