@@ -112,7 +112,7 @@ while True:
                                 sent, ret = send_sms(modem, "Can't take photo while motion is running", config.TRUSTED_PHONE)
                                 debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                             else:
-                                result = subprocess.run(["fswebcam", "--no-banner", "-d", "/dev/video0", "-r", "1920x1080", photo_name])
+                                result = subprocess.run(["fswebcam", "--no-banner", "-d", config.VIDEO_DEVICE, "-r", "1920x1080", photo_name])
                                 if result.returncode == 0:
                                     photo_sub = "Photo taken on %s saved in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), photo_name)
                                     send_mail_with_auth("Alarm photo", photo_sub, photo_name)
@@ -129,7 +129,7 @@ while True:
                                 debug("Reply to %s sent to %s: %s, %s" % (sms_command, config.TRUSTED_PHONE, sent, ret))
                             else:
                                 video_time = int(sms_split[1]) if sms_split[1] != "" and sms_split[1].isdigit() else 3
-                                result = subprocess.run(["ffmpeg", "-t", "%d" % video_time, "-f", "v4l2", "-framerate", "30", "-video_size", "800x600", "-i", "/dev/video0", video_name])
+                                result = subprocess.run(["ffmpeg", "-t", "%d" % video_time, "-f", "v4l2", "-framerate", "30", "-video_size", "800x600", "-i", config.VIDEO_DEVICE, video_name])
                                 if result.returncode == 0:
                                     video_sub = "Video recorded on %s for %ds in %s" % (datetime.now().strftime("%Y/%m/%d, %H:%M:%S"), video_time, video_name)
                                     send_mail_with_auth("Alarm video", video_sub, video_name)

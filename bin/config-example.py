@@ -15,5 +15,7 @@ TRUSTED_PHONE="+000000000000"
 
 SLEEP_TIME=3
 
+VIDEO_DEVICE="/dev/video0"
+
 LOG_PATH="/home/alarm/log"
 DEBUG=True
