@@ -169,7 +169,7 @@ while True:
                 debug("arg:\n%s\nout:\n%s\nerr:\n%s\n" % (result.args, result.stdout, result.stderr))
     # Test battery percentage change
     bp, ret = battery_percentage()
-    if ret == 0 and bp != LASTBP:
+    if ret == 0 and bp < 100 and bp != LASTBP:
         iv, _ = input_voltage()
         cc = ("charging voltage %.2fv" % (iv/1000)) if iv>3000 else "not charging"
         sent, ret = send_sms(modem, "Battery status %d%%, %s" % (bp, cc), config.TRUSTED_PHONE)
