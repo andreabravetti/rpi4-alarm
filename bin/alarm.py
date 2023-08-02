@@ -36,6 +36,14 @@ os.makedirs(config.LOG_PATH, exist_ok=True)
 # Initial starting message
 debug("Starting RPI4 Alarm")
 modem_list, modem_error = list_modem()
+while not modem_list:
+    if modem_error != 0:
+        send_mail_with_auth("Alarm error", "Error %d and no modem found" % modem_error)
+        raise Exception("Error %d and no modem found" % modem_error)
+    time.sleep(config.SLEEP_TIME)
+    modem_list, modem_error = list_modem()
+
+debug("At least one modem found")
 for modem in modem_list:
     debug("Found modem " + modem)
     sms_list, sms_error = list_sms(modem)
@@ -49,6 +57,9 @@ LASTBP=0
 # Main loop
 while True:
     modem_list, modem_error = list_modem()
+    if not modem_list or modem_error != 0:
+        send_mail_with_auth("Alarm error", "Error %d reading modem list.\n\nModem list:\n\n%s\n" % (modem_error, modem_list))
+    # FIXME: Cosa fare se un modem si scollega?
     for modem in modem_list:
         sms_list, sms_error = list_sms(modem)
         for sms in sms_list:
